@@ -1,25 +1,18 @@
 from api.client import ScalrApiClient
+
 import os
 
-## Set Scalr keys and URL. I have them set in the environment for development purposes.
-SCALR_API_KEY = os.environ['SCALR_API_KEY']
-SCALR_SECRET_KEY = os.environ['SCALR_SECRET_KEY']
-url = os.environ['SCALR_URL']
+class scriptsapi(ScalrApiClient):
 
-
-
-client = ScalrApiClient(url.rstrip("/"),SCALR_API_KEY,SCALR_SECRET_KEY)
-
-class scriptsapi(object):
-
-    def __init__(self, env):
+    def __init__(self, env, api_url, key_id, key_secret):
+        super(scriptsapi, self).__init__(api_url, key_id, key_secret)
         self.env = env
 
     def getEnv(self):
         return self.env
 
     def getIdFromName(self, name):
-        scripts = client.fetch('/api/v1beta0/user/{envId}/scripts/'.format(envId=self.env))
+        scripts = self.fetch('/api/v1beta0/user/{envId}/scripts/'.format(envId=self.env))
         for script in scripts:
             if(script['name'] == name):
                 return (script['id'])
@@ -27,18 +20,18 @@ class scriptsapi(object):
             return 0
 
     def getScript(self, scriptId):
-        return client.fetch('/api/v1beta0/user/{envId}/scripts/{scriptid}'.format(envId=self.env, scriptid=scriptId))
+        return self.fetch('/api/v1beta0/user/{envId}/scripts/{scriptid}'.format(envId=self.env, scriptid=scriptId))
 
     def listScripts(self):
-        return client.fetch('/api/v1beta0/user/{envId}/scripts/'.format(envId=self.env))
+        return self.fetch('/api/v1beta0/user/{envId}/scripts/'.format(envId=self.env))
 
     def listScriptVersions(self, scriptId):
-        return client.fetch('/api/v1beta0/user/{envId}/scripts/{scriptId}/script-versions/'.format(envId=self.env, scriptId=scriptId))
+        return self.fetch('/api/v1beta0/user/{envId}/scripts/{scriptId}/script-versions/'.format(envId=self.env, scriptId=scriptId))
 
     def writeScriptVersionsToFile(self, scriptId, directory):
-        versions = client.fetch('/api/v1beta0/user/{envId}/scripts/{scriptId}/script-versions/'.format(envId=self.env, scriptId=scriptId))
+        versions = self.fetch('/api/v1beta0/user/{envId}/scripts/{scriptId}/script-versions/'.format(envId=self.env, scriptId=scriptId))
         for version in versions:
-            path = os.path.abspath(directory) + '\\' + getScript(scriptId)['name'] + str(version['version'])
+            path = os.path.abspath(directory) + '\\' + api.getScript(scriptId)['name'] + str(version['version'])
             with open(path, 'w') as write:
                 write.writelines(version['body'])
                 write.close()
@@ -48,9 +41,12 @@ class scriptsapi(object):
 env = {
     'dc-lab':1
 }
+SCALR_API_KEY = os.environ['SCALR_API_KEY']
+SCALR_SECRET_KEY = os.environ['SCALR_SECRET_KEY']
+url = os.environ['SCALR_URL']
 
 ## init API with environment
-api = scriptsapi(env['dc-lab'])
+api = scriptsapi(env['dc-lab'],url,SCALR_API_KEY,SCALR_SECRET_KEY)
 
 ## Print a listing of all Scripts in an environment
 for list in api.listScripts():
