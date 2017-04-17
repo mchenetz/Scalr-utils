@@ -6,10 +6,7 @@ SCALR_API_KEY = os.environ['SCALR_API_KEY']
 SCALR_SECRET_KEY = os.environ['SCALR_SECRET_KEY']
 url = os.environ['SCALR_URL']
 
-## Define Environments so you do not have to remember ids.
-env = {
-    'dc-lab':1
-}
+
 
 client = ScalrApiClient(url.rstrip("/"),SCALR_API_KEY,SCALR_SECRET_KEY)
 
@@ -17,6 +14,9 @@ class scriptsapi(object):
 
     def __init__(self, env):
         self.env = env
+
+    def getEnv(self):
+        return self.env
 
     def getIdFromName(self, name):
         scripts = client.fetch('/api/v1beta0/user/{envId}/scripts/'.format(envId=self.env))
@@ -35,7 +35,7 @@ class scriptsapi(object):
     def listScriptVersions(self, scriptId):
         return client.fetch('/api/v1beta0/user/{envId}/scripts/{scriptId}/script-versions/'.format(envId=self.env, scriptId=scriptId))
 
-    def writeScriptVersionToFile(self, scriptId, directory):
+    def writeScriptVersionsToFile(self, scriptId, directory):
         versions = client.fetch('/api/v1beta0/user/{envId}/scripts/{scriptId}/script-versions/'.format(envId=self.env, scriptId=scriptId))
         for version in versions:
             path = os.path.abspath(directory) + '\\' + getScript(scriptId)['name'] + str(version['version'])
@@ -43,6 +43,11 @@ class scriptsapi(object):
                 write.writelines(version['body'])
                 write.close()
 
+## EXAMPLES
+## Define Environments so you do not have to remember ids.
+env = {
+    'dc-lab':1
+}
 
 ## init API with environment
 api = scriptsapi(env['dc-lab'])
@@ -62,4 +67,4 @@ print (api.listScriptVersions(api.getIdFromName('theforeman-installer'))[0])
 
 ## Write All Script versions of a particular Script to a directory
 ## writeScriptVersionToFile(Environment, ScriptID, Directory)
-## writeScriptVersionToFile(env['dc-lab'],getIdFromName(env['dc-lab'],'theforeman-installer'),'C://Users//user//Documents//sscripts//')
+## api.writeScriptVersionsToFile(env['dc-lab'],api.getIdFromName('theforeman-installer'),'C://Users//user//Documents//sscripts//')
