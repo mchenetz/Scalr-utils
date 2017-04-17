@@ -18,14 +18,15 @@ for list in api.listScripts():
     print list['name']
 
 ## Get Script by name and display the script
-## getScript(ScriptID)
-## ** In This case i used getIDFromName to input the ID from a given name **
-print (api.getScript(api.getIdFromName('rundeck-install')))
+## getScriptByName(Name)
+print (api.getScriptByName('rundeck-install'))
 
 ## List Versions of the Script
 ## listScriptVersions(ScriptID)
 print (api.listScriptVersions(api.getIdFromName('theforeman-installer'))[0])
 
+
+print (api.getScriptVersionByName('rundeck-install',1))
 ## Write All Script versions of a particular Script to a directory
 ## writeScriptVersionToFile(Environment, ScriptID, Directory)
 ## api.writeScriptVersionsToFile(env['dc-lab'],api.getIdFromName('theforeman-installer'),'C://Users//user//Documents//sscripts//')
