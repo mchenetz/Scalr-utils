@@ -27,6 +27,8 @@ print (api.listScriptVersions(api.getIdFromName('theforeman-installer'))[0])
 
 
 print (api.getScriptVersionByName('rundeck-install',1))
+
+print (api.getLatestScriptVersion(6))
 ## Write All Script versions of a particular Script to a directory
 ## writeScriptVersionToFile(Environment, ScriptID, Directory)
 ## api.writeScriptVersionsToFile(env['dc-lab'],api.getIdFromName('theforeman-installer'),'C://Users//user//Documents//sscripts//')

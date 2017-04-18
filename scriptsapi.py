@@ -40,6 +40,12 @@ class scriptsapi(ScalrApiClient):
     def listScriptVersionsByName(self, name):
         return self.listScriptVersions(self.getIdFromName(name))
 
+    def getLatestScriptVersion(self, scriptId):
+        versions = self.listScriptVersions(scriptId)
+        for version in versions:
+            id = version['version']
+        return id
+
     def writeScriptVersionsToFile(self, scriptId, directory):
         versions = self.listScriptVersions(scriptId)
         for version in versions:
