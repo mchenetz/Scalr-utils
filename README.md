@@ -26,7 +26,7 @@ The above line will display all CLI options
 ## Config File ##
 
 ---
-The config file can be placed in the directory with all of the python files or your home directory
+The config file can be placed in the program directory or your home directory
 
 File: .scalr.cfg
 

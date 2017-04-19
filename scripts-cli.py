@@ -38,7 +38,7 @@ action.add_argument('-ls','--listscripts', help='Lists all Scalr Scripts', actio
 action.add_argument('-in', '--interactive', help='Interactive Console', action='store_const', const=True)
 cli = vars(args.parse_args())
 
-print cli
+# print cli
 
 if cli['listscripts'] != None:
     print ('Scripts: ')

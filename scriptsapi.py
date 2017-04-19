@@ -42,6 +42,7 @@ class scriptsapi(ScalrApiClient):
 
     def getLatestScriptVersion(self, scriptId):
         versions = self.listScriptVersions(scriptId)
+        id = 0
         for version in versions:
             id = version['version']
         return id
