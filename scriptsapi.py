@@ -49,7 +49,7 @@ class scriptsapi(ScalrApiClient):
     def writeScriptVersionsToFile(self, scriptId, directory):
         versions = self.listScriptVersions(scriptId)
         for version in versions:
-            path = os.path.abspath(directory) + '\\' + self.getScript(scriptId)['name'] + str(version['version'])
+            path = os.path.join(os.path.abspath(directory), self.getScript(scriptId)['name'] + str(version['version']))
             with open(path, 'w') as write:
                 write.writelines(version['body'])
                 write.close()
@@ -59,7 +59,7 @@ class scriptsapi(ScalrApiClient):
 
     def writeScriptVersionToFile(self, scriptId, scriptVersion, directory):
         version = self.getScriptVersion(scriptId, scriptVersion)
-        path = os.path.abspath(directory) + '\\' + self.getScript(scriptId)['name'] + str(version['version'])
+        path = os.path.join(os.path.abspath(directory), self.getScript(scriptId)['name'] + str(version['version']))
         with open(path, 'w') as write:
             write.writelines(version['body'])
             write.close()
