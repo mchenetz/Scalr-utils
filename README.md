@@ -22,3 +22,17 @@ The above launches an interactive console.
 `scripts-cli.py`
 
 The above line will display all CLI options
+
+## Config File ##
+
+---
+The config file can be placed in the directory with all of the python files or your home directory
+
+File: .scalr.cfg
+
+```
+[Scalr]
+key: [Scalr key]
+secret: [Scalr secret]
+url: [http://Scalr URL]
+```

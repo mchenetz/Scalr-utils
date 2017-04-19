@@ -1,15 +1,32 @@
 from scriptsapi import scriptsapi
 import scriptscmd
 import os
+from os.path import expanduser
 import argparse
-
+import ConfigParser
 
 env = {
     'dc-lab':1
 }
-SCALR_API_KEY = os.environ['SCALR_API_KEY']
-SCALR_SECRET_KEY = os.environ['SCALR_SECRET_KEY']
-SCALR_URL = os.environ['SCALR_URL']
+home = expanduser("~")
+configfile = '.scalr.cfg'
+homeconfig = os.path.join(home,configfile)
+
+if os.path.isfile(configfile) or os.path.isfile(homeconfig):
+    config = ConfigParser.ConfigParser()
+    if os.path.isfile(configfile):
+        config.read(configfile)
+    elif os.path.isfile(homeconfig):
+        config.read(homeconfig)
+    SCALR_API_KEY = config.get('Scalr','key')
+    SCALR_SECRET_KEY = config.get ('Scalr','secret')
+    SCALR_URL = config.get('Scalr','url')
+
+
+else:
+    SCALR_API_KEY = os.environ['SCALR_API_KEY']
+    SCALR_SECRET_KEY = os.environ['SCALR_SECRET_KEY']
+    SCALR_URL = os.environ['SCALR_URL']
 
 ## init API with environment
 api = scriptsapi(env['dc-lab'],SCALR_URL,SCALR_API_KEY,SCALR_SECRET_KEY)

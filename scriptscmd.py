@@ -1,6 +1,5 @@
 import cmd
-import sys
-from scriptsapi import scriptsapi
+
 
 class scriptscmd(cmd.Cmd):
     def __init__(self, api, completekey='tab', stdin=None, stdout=None):
@@ -10,11 +9,16 @@ class scriptscmd(cmd.Cmd):
 
     def help_list(self):
         print ('Lists All Scripts')
+        print ('cmd: list')
 
     def do_list(self, null):
         print ('Scripts: ')
         for list in self.api.listScripts():
             print str(list['id']) + '. ' + list['name']
+
+    def help_getscript(self):
+        print('Get latest version of a script')
+        print('cmd: getscript')
 
     def do_getscript(self, null):
         self.do_list(self)
@@ -22,4 +26,4 @@ class scriptscmd(cmd.Cmd):
         print(self.api.getScriptVersion(cmd, self.api.getLatestScriptVersion(cmd))['body'])
 
     def postloop(self):
-        print
+        print ('Goodbye')
