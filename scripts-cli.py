@@ -1,13 +1,11 @@
 from scriptsapi import scriptsapi
 import scriptscmd
 import os
+import sys
 from os.path import expanduser
 import argparse
 import ConfigParser
 
-env = {
-    'dc-lab':1
-}
 home = expanduser("~")
 configfile = '.scalr.cfg'
 homeconfig = os.path.join(home,configfile)
@@ -21,22 +19,22 @@ if os.path.isfile(configfile) or os.path.isfile(homeconfig):
     SCALR_API_KEY = config.get('Scalr','key')
     SCALR_SECRET_KEY = config.get ('Scalr','secret')
     SCALR_URL = config.get('Scalr','url')
-
-
 else:
     SCALR_API_KEY = os.environ['SCALR_API_KEY']
     SCALR_SECRET_KEY = os.environ['SCALR_SECRET_KEY']
     SCALR_URL = os.environ['SCALR_URL']
 
-## init API with environment
-api = scriptsapi(env['dc-lab'],SCALR_URL,SCALR_API_KEY,SCALR_SECRET_KEY)
 
-args = argparse.ArgumentParser(prog='scripts-cli',description='Scalr Scripting CLI')
-args.add_argument('--env', required=True, help='Scalr Environment')
-action = args.add_mutually_exclusive_group()
+parser = argparse.ArgumentParser(prog='scripts-cli',description='Scalr Scripting CLI')
+parser.add_argument('--env', required=True, help='Scalr Environment')
+action = parser.add_mutually_exclusive_group()
 action.add_argument('-ls','--listscripts', help='Lists all Scalr Scripts', action='store_const', const=True)
 action.add_argument('-in', '--interactive', help='Interactive Console', action='store_const', const=True)
-cli = vars(args.parse_args())
+action.add_argument('-gs', '--getscript', help='Get Script From Scalr: -gs [Scriptname or ID] [Version]', nargs=2)
+parser.add_argument('output', type=argparse.FileType('w'), help="Specifies the output file")
+args = parser.parse_args()
+cli = vars(args)
+api = scriptsapi(cli['env'],SCALR_URL,SCALR_API_KEY,SCALR_SECRET_KEY)
 
 # print cli
 
@@ -44,10 +42,20 @@ if cli['listscripts'] != None:
     print ('Scripts: ')
     for list in api.listScripts():
         print str(list['id']) + '. ' + list['name']
-
 elif cli['interactive'] != None:
     cmd = scriptscmd.scriptscmd(api)
     cmd.cmdloop()
-
-
+elif cli['getscript']:
+    scriptName = cli['getscript'][0]
+    version = cli['getscript'][1]
+    if type(cli['getscript'][1]) is int:
+        if type(scriptName) is int:
+            args.output.write(api.getScriptVersion(scriptName, version)['body'])
+        elif type(scriptName) is str:
+            args.output.write(api.getScriptVersion(api.getIdFromName(scriptName), version)['body'])
+    else:
+        if type(scriptName) is int:
+            args.output.write(api.getScriptVersion(scriptName, api.getLatestScriptVersion(scriptName))['body'])
+        elif type(scriptName) is str:
+            args.output.write(api.getScriptVersion(api.getIdFromName(scriptName), api.getLatestScriptVersion(api.getIdFromName(scriptName)))['body'])
 

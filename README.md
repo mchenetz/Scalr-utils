@@ -19,6 +19,12 @@ Example:
 
 The above launches an interactive console.
 
+`scripts-cli.py --env 1 -gs [Scriptname or ID] [Version or latest] [output file or '-' for stdout]`
+
+`scripts-cli.py --env 1 -gs rundeck-install latest rundeck.sh`
+
+The above will get a specific script version to a file or standard output.
+
 `scripts-cli.py`
 
 The above line will display all CLI options
