@@ -30,7 +30,7 @@ parser.add_argument('--env', required=True, help='Scalr Environment')
 action = parser.add_mutually_exclusive_group()
 action.add_argument('-ls','--listscripts', help='Lists all Scalr Scripts', action='store_const', const=True)
 action.add_argument('-in', '--interactive', help='Interactive Console', action='store_const', const=True)
-action.add_argument('-gs', '--getscript', help='Get Script From Scalr: -gs [Scriptname or ID] [Version]', nargs=2)
+action.add_argument('-gs', '--getscript', help='Get Script From Scalr', nargs=2, metavar=('[Script]','[Version]'))
 parser.add_argument('output', type=argparse.FileType('w'), help="Specifies the output file")
 args = parser.parse_args()
 cli = vars(args)
@@ -48,12 +48,12 @@ elif cli['interactive'] != None:
 elif cli['getscript']:
     scriptName = cli['getscript'][0]
     version = cli['getscript'][1]
-    if type(cli['getscript'][1]) is int:
+    if type(version) is int:
         if type(scriptName) is int:
             args.output.write(api.getScriptVersion(scriptName, version)['body'])
         elif type(scriptName) is str:
             args.output.write(api.getScriptVersion(api.getIdFromName(scriptName), version)['body'])
-    else:
+    elif type(version) is str and version=='latest':
         if type(scriptName) is int:
             args.output.write(api.getScriptVersion(scriptName, api.getLatestScriptVersion(scriptName))['body'])
         elif type(scriptName) is str:
