@@ -1,7 +1,6 @@
 from scriptsapi import scriptsapi
 import scriptscmd
 import os
-import sys
 from os.path import expanduser
 import argparse
 import ConfigParser
@@ -33,21 +32,20 @@ action.add_argument('-ls','--listscripts', help='Lists all Scalr Scripts', actio
 action.add_argument('-in', '--interactive', help='Interactive Console', action='store_const', const=True)
 action.add_argument('-gs', '--getscript', help='Get Script From Scalr', nargs=2, metavar=('[Script]','[Version]'))
 action.add_argument('-le', '--listenvironment', help='List all available environments', action='store_const', const=True)
-parser.add_argument('output', type=argparse.FileType('w'), help="Specifies the output file")
+parser.add_argument('output', type=argparse.FileType('w'), help="Specifies the output file", nargs='?', const='-')
 args = parser.parse_args()
 cli = vars(args)
 api = scriptsapi(cli['env'],SCALR_URL,SCALR_API_KEY,SCALR_SECRET_KEY)
 
 # print cli
-
 if cli['listenvironment'] !=None:
-    print('Environments: ')
+    args.output.write('Environments: ')
     for env in api.listEnvironments():
-        print str(env['id']) +'. '+env['name']
+        args.output.write (str(env['id']) +'. '+env['name'])
 if cli['listscripts'] != None:
-    print ('Scripts: ')
+    args.output.write ('Scripts: ')
     for list in api.listScripts():
-        print str(list['id']) + '. ' + list['name']
+        args.output.write (str(list['id']) + '. ' + list['name'])
 elif cli['interactive'] != None:
     cmd = scriptscmd.scriptscmd(api)
     cmd.cmdloop()

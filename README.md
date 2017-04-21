@@ -4,9 +4,9 @@
 
 ### **scriptsapi.py** - This API includes functionality that will allow you to work with scripts within Scalr. Take a look at the example.py for usage.
 
-### **scripts-cli.py ** - Main CLI - See direction below
+### **scripts-cli.py** - Main CLI - See direction below
 
-### **scriptcmd.py ** - Interactive Console Commands for Scipting CLI. Launched by scripts CLI
+### **scriptcmd.py** - Interactive Console Commands for Scipting CLI. Launched by scripts CLI
 
 ## Direction ##
 ---
