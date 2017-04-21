@@ -2,14 +2,17 @@ from api.client import ScalrApiClient
 
 import os
 
-class scriptsapi(ScalrApiClient):
 
+class scriptsapi(ScalrApiClient):
     def __init__(self, env, api_url, key_id, key_secret):
         super(scriptsapi, self).__init__(api_url, key_id, key_secret)
         self.env = env
 
-    def getEnv(self):
+    def getCurrentEnv(self):
         return self.env
+
+    def listEnvironments(self):
+        return self.fetch('/api/v1beta0/account/environments/')
 
     def getIdFromName(self, name):
         scripts = self.fetch('/api/v1beta0/user/{envId}/scripts/'.format(envId=self.env))
@@ -67,3 +70,38 @@ class scriptsapi(ScalrApiClient):
 
     def writeScriptVersionByNameToFile(self, name, scriptVersion, directory):
         self.writeScriptVersionToFile(self.getIdFromName(name),scriptVersion, directory)
+
+    def createScript(self, name, osType):
+        json = {
+            'name': name,
+            'osType': osType
+        }
+        request = self.post('/api/v1beta0/user/{envId}/scripts/'.format(envId=self.env), json=json)
+        return request
+
+    def createScriptVersion(self, script, body):
+        if type(script) is int:
+            scriptId = script
+        if type(script) is str:
+            scriptId = self.getIdFromName(script)
+
+        json = {
+            'script': scriptId,
+            'body': body
+        }
+        request = self.post('/api/v1beta0/user/{envId}/scripts/{scriptId}/script-versions/'.format(envId=self.env, scriptId=scriptId), json=json)
+        return request
+
+    def deleteScript(self, script):
+        if type(script) is int:
+            request = self.delete('/api/v1beta0/user/{envId}/scripts/{scriptId}/'.format(envId=self.env, scriptId=script))
+        if type(script) is str:
+            request = self.delete('/api/v1beta0/user/{envId}/scripts/{scriptId}/'.format(envId=self.env, scriptId=self.getIdFromName(script)))
+        return request
+
+    def deleteScriptVersion(self, script, scriptVersionNumber):
+        if type(script) is int:
+            request = self.delete('/api/v1beta0/user/{envId}/scripts/{scriptId}/script-versions/{scriptVersionNumber}/'.format(envId=self.env, scriptId=script, scriptVersionNumber=scriptVersionNumber))
+        if type(script) is str:
+            request = self.delete('/api/v1beta0/user/{envId}/scripts/{scriptId}/script-versions/{scriptVersionNumber}/'.format(envId=self.env, scriptId=self.getIdFromName(script), scriptVersionNumber=scriptVersionNumber))
+        return request

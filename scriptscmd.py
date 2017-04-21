@@ -8,6 +8,13 @@ class scriptscmd(cmd.Cmd):
         self.api = api
         self.prompt = 'Scalr>'
         self.intro = 'Script Console\nBy Michael Chenetz\n--------------'
+    def help_listenv(self):
+        print ('Lists all available environments')
+
+    def do_listenv(self):
+        print('Environments: ')
+        for env in self.api.listEnvironments():
+            print str(env['id']) + '. ' + env['name']
 
     def help_list(self):
         print ('Lists All Scripts')
