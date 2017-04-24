@@ -28,9 +28,12 @@ print ('------------------------------------------')
 parser = argparse.ArgumentParser(prog='scripts-cli',description='Scalr Scripting CLI')
 parser.add_argument('--env', required=True, help='Scalr Environment')
 action = parser.add_mutually_exclusive_group()
-action.add_argument('-ls','--listscripts', help='Lists all Scalr Scripts', action='store_const', const=True)
-action.add_argument('-in', '--interactive', help='Interactive Console', action='store_const', const=True)
-action.add_argument('-gs', '--getscript', help='Get Script From Scalr', nargs=2, metavar=('[Script]','[Version]'))
+action.add_argument('-ls','--listscripts', help='Lists all scripts', action='store_const', const=True)
+action.add_argument('-in', '--interactive', help='Interactive console', action='store_const', const=True)
+action.add_argument('-gs', '--getscript', help='Get specific script', nargs=2, metavar=('[Script]','[Version]'))
+action.add_argument('-gasv','--getallscriptversions', help='Get all script versions', nargs=1, metavar=('[Script]'))
+action.add_argument('-wasv','--writeallscriptversions', help='write all script versions to directory', nargs=2, metavar=('[Script]', '[directory]'))
+action.add_argument('-wasd', '--writeallscriptstodirectory', help='Writes all scripts and versions to directory', nargs=1, metavar=('[Directory]'))
 action.add_argument('-le', '--listenvironment', help='List all available environments', action='store_const', const=True)
 parser.add_argument('output', type=argparse.FileType('w'), help="Specifies the output file", nargs='?', const='-')
 args = parser.parse_args()
@@ -42,7 +45,7 @@ if cli['listenvironment'] !=None:
     args.output.write('Environments: ')
     for env in api.listEnvironments():
         args.output.write (str(env['id']) +'. '+env['name'])
-if cli['listscripts'] != None:
+elif cli['listscripts'] != None:
     args.output.write ('Scripts: ')
     for list in api.listScripts():
         args.output.write (str(list['id']) + '. ' + list['name'])
@@ -52,14 +55,38 @@ elif cli['interactive'] != None:
 elif cli['getscript']:
     scriptName = cli['getscript'][0]
     version = cli['getscript'][1]
-    if type(version) is int:
-        if type(scriptName) is int:
+    if version.isdigit():
+        if scriptName.isdigit():
             args.output.write(api.getScriptVersion(scriptName, version)['body'])
-        elif type(scriptName) is str:
+        else:
             args.output.write(api.getScriptVersion(api.getIdFromName(scriptName), version)['body'])
-    elif type(version) is str and version=='latest':
-        if type(scriptName) is int:
+    else:
+        if scriptName.isdigit():
             args.output.write(api.getScriptVersion(scriptName, api.getLatestScriptVersion(scriptName))['body'])
-        elif type(scriptName) is str:
+        else:
             args.output.write(api.getScriptVersion(api.getIdFromName(scriptName), api.getLatestScriptVersion(api.getIdFromName(scriptName)))['body'])
-
+elif cli['getallscriptversions']:
+    scriptName = cli['getallscriptversions'][0]
+    if scriptName.isdigit():
+        print ('number')
+        scriptVersions = api.listScriptVersions(scriptName)
+    else:
+        print('name')
+        scriptVersions = api.listScriptVersions(api.getIdFromName(scriptName))
+    if scriptVersions:
+        for version in scriptVersions:
+            print (version['body'])
+elif cli['writeallscriptversions']:
+    scriptName = cli['writeallscriptversions'][0]
+    directory = cli['writeallscriptversions'][1]
+    if scriptName.isdigit():
+        scriptId = scriptName
+    else:
+        scriptId = api.getIdFromName(scriptName)
+    if scriptId:
+        api.writeScriptVersionsToFile(scriptId, directory)
+elif cli['writeallscriptstodirectory']:
+    directory = cli['writeallscriptstodirectory'][0]
+    print ('Writing All Scripts and Versions to: ', directory)
+    api.writeAllScriptsAndVersionsToFile(directory)
+    print ('Completed!')

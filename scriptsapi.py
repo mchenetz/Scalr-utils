@@ -71,6 +71,14 @@ class scriptsapi(ScalrApiClient):
     def writeScriptVersionByNameToFile(self, name, scriptVersion, directory):
         self.writeScriptVersionToFile(self.getIdFromName(name),scriptVersion, directory)
 
+    def writeAllScriptsAndVersionsToFile(self, directory):
+        for script in self.listScripts():
+            for version in self.listScriptVersions(script['id']):
+                path = os.path.join(os.path.abspath(directory), self.getScript(script['id'])['name'] + str(version['version']))
+                with open(path, 'w') as write:
+                    write.writelines(version['body'])
+                    write.close()
+
     def createScript(self, name, osType):
         json = {
             'name': name,
@@ -97,11 +105,13 @@ class scriptsapi(ScalrApiClient):
             request = self.delete('/api/v1beta0/user/{envId}/scripts/{scriptId}/'.format(envId=self.env, scriptId=script))
         if type(script) is str:
             request = self.delete('/api/v1beta0/user/{envId}/scripts/{scriptId}/'.format(envId=self.env, scriptId=self.getIdFromName(script)))
-        return request
+        if request:
+            return request
 
     def deleteScriptVersion(self, script, scriptVersionNumber):
         if type(script) is int:
             request = self.delete('/api/v1beta0/user/{envId}/scripts/{scriptId}/script-versions/{scriptVersionNumber}/'.format(envId=self.env, scriptId=script, scriptVersionNumber=scriptVersionNumber))
         if type(script) is str:
             request = self.delete('/api/v1beta0/user/{envId}/scripts/{scriptId}/script-versions/{scriptVersionNumber}/'.format(envId=self.env, scriptId=self.getIdFromName(script), scriptVersionNumber=scriptVersionNumber))
-        return request
+        if request:
+            return request

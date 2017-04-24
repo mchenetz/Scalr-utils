@@ -32,4 +32,4 @@ print (api.getLatestScriptVersion(6))
 ## Write All Script versions of a particular Script to a directory
 ## writeScriptVersionToFile(Environment, ScriptID, Directory)
 ## api.writeScriptVersionsToFile(env['dc-lab'],api.getIdFromName('theforeman-installer'),'C://Users//user//Documents//sscripts//')
-
+api.writeAllScriptsAndVersionsToFile('testdir')
