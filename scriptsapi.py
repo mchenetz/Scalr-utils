@@ -8,6 +8,20 @@ class scriptsapi(ScalrApiClient):
         super(scriptsapi, self).__init__(api_url, key_id, key_secret)
         self.env = env
 
+    def setFileExtFromShebang(self, shebang):
+        if shebang == '#!/bin/bash':
+            return '.sh'
+        elif shebang == '#!/usr/bin/env python':
+            return '.py'
+        elif shebang == '!/usr/bin/python3':
+            return '.py'
+        elif shebang == '#!cmd':
+            return '.bat'
+        elif shebang == '#!powershell':
+            return '.ps'
+        else:
+            return '.txt'
+
     def getCurrentEnv(self):
         return self.env
 
@@ -63,7 +77,9 @@ class scriptsapi(ScalrApiClient):
 
     def writeScriptVersionToFile(self, scriptId, scriptVersion, directory):
         version = self.getScriptVersion(scriptId, scriptVersion)
-        path = os.path.join(os.path.abspath(directory), self.getScript(scriptId)['name'] + str(version['version']))
+        shebang = version['body'].split('\n', 1)[0]
+        ext = self.setFileExtFromShebang(shebang)
+        path = os.path.join(os.path.abspath(directory), self.getScript(scriptId)['name'] + str(version['version']) + ext)
         with open(path, 'w') as write:
             write.writelines(version['body'])
             write.close()
@@ -74,7 +90,9 @@ class scriptsapi(ScalrApiClient):
     def writeAllScriptsAndVersionsToFile(self, directory):
         for script in self.listScripts():
             for version in self.listScriptVersions(script['id']):
-                path = os.path.join(os.path.abspath(directory), self.getScript(script['id'])['name'] + str(version['version']))
+                shebang = version['body'].split('\n', 1)[0]
+                ext = self.setFileExtFromShebang(shebang)
+                path = os.path.join(os.path.abspath(directory), self.getScript(script['id'])['name'] + str(version['version']) + ext)
                 with open(path, 'w') as write:
                     write.writelines(version['body'])
                     write.close()
