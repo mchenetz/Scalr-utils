@@ -29,6 +29,20 @@ The above will get a specific script version to a file or standard output.
 
 The above line will display all CLI options
 
+# Import and Export #
+### There is now the ability to import and export all scripts from a Scalr environment ###
+
+`scripts-cli.py --env 1 -ex [directory]`
+
+The above line will export all scripts to the specified directory
+
+`scripts-cli.py --env 1 -im [directory]`
+
+The above line will import the previously exported scripts from the specified directory.
+
+**Note:** All script imports create a new version
+
+
 ## Config File ##
 
 ---

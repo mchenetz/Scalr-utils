@@ -33,8 +33,9 @@ action.add_argument('-in', '--interactive', help='Interactive console', action='
 action.add_argument('-gs', '--getscript', help='Get specific script', nargs=2, metavar=('[Script]','[Version]'))
 action.add_argument('-gasv','--getallscriptversions', help='Get all script versions', nargs=1, metavar=('[Script]'))
 action.add_argument('-wasv','--writeallscriptversions', help='write all script versions to directory', nargs=2, metavar=('[Script]', '[directory]'))
-action.add_argument('-wasd', '--writeallscriptstodirectory', help='Writes all scripts and versions to directory', nargs=1, metavar=('[Directory]'))
+action.add_argument('-ex', '--export', help='Export all scripts and versions to directory', nargs=1, metavar=('[Directory]'))
 action.add_argument('-le', '--listenvironment', help='List all available environments', action='store_const', const=True)
+action.add_argument('-im','--import', help='import scripts from files in directory', nargs=1, metavar=('[Directory]'))
 parser.add_argument('output', type=argparse.FileType('w'), help="Specifies the output file", nargs='?', const='-')
 args = parser.parse_args()
 cli = vars(args)
@@ -85,8 +86,11 @@ elif cli['writeallscriptversions']:
         scriptId = api.getIdFromName(scriptName)
     if scriptId:
         api.writeScriptVersionsToFile(scriptId, directory)
-elif cli['writeallscriptstodirectory']:
-    directory = cli['writeallscriptstodirectory'][0]
-    print ('Writing All Scripts and Versions to: ', directory)
+elif cli['export']:
+    directory = cli['export'][0]
+    print ('Exporting All Scripts and Versions to: ', directory)
     api.writeAllScriptsAndVersionsToFile(directory)
     print ('Completed!')
+elif cli['import']:
+    directory = cli['import'][0]
+    api.createScriptsFromDirectory(directory)

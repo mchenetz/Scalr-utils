@@ -13,7 +13,7 @@ class scriptsapi(ScalrApiClient):
             return '.sh'
         elif shebang == '#!/usr/bin/env python':
             return '.py'
-        elif shebang == '!/usr/bin/python3':
+        elif shebang == '#!/usr/bin/python3':
             return '.py'
         elif shebang == '#!cmd':
             return '.bat'
@@ -21,6 +21,24 @@ class scriptsapi(ScalrApiClient):
             return '.ps'
         else:
             return '.txt'
+    def setOsByExt (self, ext):
+        windows = ['ps','bat']
+        linux = ['sh','py']
+        if ext in windows:
+            return 'windows'
+        elif ext in linux:
+            return 'linux'
+
+    def checkExistsScript(self, script):
+        if script.isdigit():
+            scriptId=script
+        else:
+            scriptId = self.getIdFromName(script)
+        scripts = self.listScripts()
+        for script in scripts:
+            if script['id']==scriptId:
+                return True
+        return False
 
     def getCurrentEnv(self):
         return self.env
@@ -92,7 +110,7 @@ class scriptsapi(ScalrApiClient):
             for version in self.listScriptVersions(script['id']):
                 shebang = version['body'].split('\n', 1)[0]
                 ext = self.setFileExtFromShebang(shebang)
-                path = os.path.join(os.path.abspath(directory), self.getScript(script['id'])['name'] + str(version['version']) + ext)
+                path = os.path.join(os.path.abspath(directory), self.getScript(script['id'])['name'] + '_' + str(version['version']) + ext)
                 with open(path, 'w') as write:
                     write.writelines(version['body'])
                     write.close()
@@ -117,6 +135,24 @@ class scriptsapi(ScalrApiClient):
         }
         request = self.post('/api/v1beta0/user/{envId}/scripts/{scriptId}/script-versions/'.format(envId=self.env, scriptId=scriptId), json=json)
         return request
+
+    def createScriptsFromDirectory(self, directory):
+        path = os.path.abspath(directory)
+        filenames = next(os.walk(path))[2]
+        for file in filenames:
+            ext = file.split('.')[-1]
+            extSplit = file.split('.' + ext)[0]
+            version = extSplit.split("_")[-1]
+            name = extSplit.split("_" + version)[0]
+            print ('processing: ' + name + ' - Version: ' + version)
+            if not self.checkExistsScript(name.strip()):
+                print ('Script does not exist, Creating!')
+                self.createScript(name, self.setOsByExt(ext))
+            lines = open(os.path.join(path, file), 'r')
+            allLines = ''.join( str(line) for line in lines.readlines())
+            self.createScriptVersion(name, allLines)
+            lines.close()
+
 
     def deleteScript(self, script):
         if type(script) is int:
